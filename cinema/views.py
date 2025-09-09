@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.db.models import F, Count
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.pagination import OrderSetPagination
@@ -118,6 +119,8 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
+    pagination_class = OrderSetPagination
+    permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -125,7 +128,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         return OrderSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save()
 
     def get_queryset(self):
         queryset = self.queryset.filter(user=self.request.user)
