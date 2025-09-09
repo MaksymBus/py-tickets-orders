@@ -15,7 +15,9 @@ from cinema.serializers import (
     MovieSessionListSerializer,
     MovieDetailSerializer,
     MovieSessionDetailSerializer,
-    MovieListSerializer, OrderSerializer, OrderListSerializer,
+    MovieListSerializer,
+    OrderSerializer,
+    OrderListSerializer,
 )
 
 
@@ -59,7 +61,7 @@ class MovieViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(title__icontains=title)
 
         if self.action in ("list", "retrieve"):
-            return queryset.prefetch_related("genres", "actors")
+            return queryset.prefetch_related("genres", "actors").distinct()
 
         return queryset.distinct()
 
@@ -116,7 +118,6 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
-    pagination_class = OrderSetPagination
 
     def get_serializer_class(self):
         if self.action == "list":
